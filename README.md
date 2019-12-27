@@ -7,3 +7,5 @@ Alpha-Beta Pruning,
 Move Ordering,
 Iterative Deepening,
 Transposition Table
+
+A work in progress.
