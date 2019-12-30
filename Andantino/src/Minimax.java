@@ -54,9 +54,9 @@ public class Minimax extends Player
         int bestScore = alpha;
         int currentScore;
 
-        ArrayList<Pair> successors = sortMoves(board);
+        //ArrayList<Pair> successors = sortMoves(board);
 
-        for (Pair pair: successors)
+        for (Pair pair: board.getMoves()) // successors
         {
             Board newBoard = board.copyBoard();
             newBoard.makeMove(pair);
@@ -81,6 +81,7 @@ public class Minimax extends Player
         else 						entry2.flag = flag.ACCURATE;
 
         table.insert(entry2);
+
         return new MoveAndScore(bestMove, bestScore);
     }
 
@@ -93,6 +94,9 @@ public class Minimax extends Player
         {
             output = abNegamax(board, i, 0, alpha, beta);
         }
+        if (GUI.timeLimit < System.currentTimeMillis() - start_time)
+            System.out.println("Time limit reached.");
+
         return output.getPair();
     }
 

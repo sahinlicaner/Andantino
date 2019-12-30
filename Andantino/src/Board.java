@@ -1,3 +1,4 @@
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class Board
@@ -5,13 +6,16 @@ public class Board
     public int[][] tiles;
     public ArrayList<Pair> movesMade;
     private ArrayList<ArrayList<Pair>> whiteGroup, blackGroup;
+    private ArrayList<Pair> whites, blacks;
     private int hashValue;
     private int turn;
+    private boolean noMoves;
 
     public Board()
     {
         turn = 0;
         hashValue = 0;
+        noMoves = false;
         tiles = new int[Game.rowsNum][];
         movesMade = new ArrayList<Pair>();
         whiteGroup = new ArrayList<ArrayList<Pair>>();
@@ -58,7 +62,7 @@ public class Board
 
         if (turn == 1) list = getNeighbors(new Pair(9, (int) 'J' - (int) 'A'), 0);
 
-        else
+        else if (!this.isGameOver())
         {
             int j, i;
             int jEnd = 10;
@@ -73,6 +77,7 @@ public class Board
                     }
                 }
             }
+            if (list.isEmpty()) noMoves = true;
         }
         return list;
     }
@@ -124,7 +129,6 @@ public class Board
 
             if(this.turn > 0) movesMade.add(pair);
             nextTurn();
-            System.out.println();
         }
     }
 
@@ -148,6 +152,11 @@ public class Board
                 lists.get(x.get(0)).removeAll(lists.get(x.get(i)));
                 lists.get(x.get(0)).addAll(lists.get(x.get(i)));
                 lists.remove(lists.get(x.get(i)));
+
+                if (i + 1 != x.size())
+                {
+                    x.set(i+1, x.get(i+1)-1);
+                }
             }
         }
     }
@@ -160,7 +169,8 @@ public class Board
         {
             for (Pair pair2 : getNeighbors(pair, 2))
             {
-                if(pair2.memberOfaList(list)) {returnList.add(lists.lastIndexOf(list)); break;}
+                if(pair2.memberOfaList(list)) {
+                    returnList.add(lists.lastIndexOf(list)); break;}
             }
         }
         return returnList;
@@ -282,6 +292,7 @@ public class Board
     {
         int[] arr = checkStreak();
         if (arr[6] == 1) return true;
+        if (this.noMoves) return true;
 
         for (ArrayList<Pair> list : whiteGroup)
         {
@@ -318,7 +329,6 @@ public class Board
                 }
             }
         }
-        if (this.getMoves().isEmpty()) {return true;}
         return false;
     }
 
@@ -346,14 +356,10 @@ public class Board
     {
         if (isGameOver()) return -300000;
 
-        //if (isGameOver() && isWhitesTurn()) return Integer.MIN_VALUE;
-        //else if (isGameOver() && !isWhitesTurn()) return Integer.MAX_VALUE;
-
-        int score = -50 + (int)(Math.random() * ((50 - (-50)) + 1));
+        int score = -10 + (int)(Math.random() * ((10 - (-10)) + 1));
         int[] arr = checkStreak();
-
-        score += 10*(arr[0] - arr[3]) + 50*(arr[1] - arr[4]) + 400*(arr[2] - arr[5]) + 200*((blackGroup.size() - whiteGroup.size()));
-
+        score += 10*(arr[0] - arr[3]) + 50*(arr[1] - arr[4]) + 100*(arr[2] - arr[5]);// + 500*((blackGroup.size() - whiteGroup.size()));
+        
         if (!isWhitesTurn()) return -score;
         else 				return score;
     }
@@ -373,6 +379,7 @@ public class Board
 
         this.tiles[movesMade.get(movesMade.size() - 1).getX()][movesMade.get(movesMade.size() - 1).getY()] = 10;
         previousTurn();
+        this.noMoves = false;
         movesMade.remove(movesMade.size() - 1);
     }
 }
